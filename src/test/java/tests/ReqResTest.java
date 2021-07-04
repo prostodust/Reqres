@@ -12,6 +12,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 public class ReqResTest {
+    String BASE_URL = "https://reqres.in/api/";
 
     @Test (description = "Get list users, verify 'total' and 'last name' field first user")
     public void getListUsersTest() {
@@ -19,7 +20,7 @@ public class ReqResTest {
                 given()
                         .log().all()
                 .when()
-                        .get("https://reqres.in/api/users?page=2")
+                        .get(BASE_URL + "users?page=2")
                 .then()
                         .statusCode(200)
                         .extract().body().asString();
@@ -35,7 +36,7 @@ public class ReqResTest {
         given()
                 .log().all()
         .when()
-                .get("https://reqres.in/api/users/2")
+                .get(BASE_URL + "users/2")
         .then()
                 .log().all()
                 .statusCode(200)
@@ -48,34 +49,38 @@ public class ReqResTest {
         given()
                 .log().all()
         .when()
-                .get("https://reqres.in/api/users/23")
+                .get(BASE_URL + "users/23")
         .then()
                 .log().all()
                 .statusCode(404);
     }
 
     @Test (description = "Get the list resource and check it with the file")
-    public void getListResourceTest() throws FileNotFoundException {
-        ResourceList expectedList = new Gson().fromJson(new FileReader("src/test/java/resources/expectedList.json"), ResourceList.class);
-        String response =
-            given()
-                    .log().all()
-            .when()
-                    .get("https://reqres.in/api/unknown")
-            .then()
-                    .log().all()
-                    .statusCode(200)
-                    .extract().body().asString();
-        ResourceList resourceList = new Gson().fromJson(response, ResourceList.class);
-        Assert.assertEquals(resourceList.getData(), expectedList.getData());
+    public void getListResourceTest() {
+        try {
+            ResourceList expectedList = new Gson().fromJson(new FileReader("src/test/java/resources/expectedList.json"), ResourceList.class);
+            String response =
+                    given()
+                            .log().all()
+                    .when()
+                            .get(BASE_URL + "unknown")
+                    .then()
+                            .log().all()
+                            .statusCode(200)
+                            .extract().body().asString();
+            ResourceList resourceList = new Gson().fromJson(response, ResourceList.class);
+            Assert.assertEquals(resourceList.getData(), expectedList.getData());
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
-    @Test  (description = "Get single resource, verify 'name' and 'year' field")
+    @Test (description = "Get single resource, verify 'name' and 'year' field")
     public void getSingleResourceTest() {
         given()
                 .log().all()
         .when()
-                .get("https://reqres.in/api/unknown/2")
+                .get(BASE_URL + "unknown/2")
         .then()
                 .log().all()
                 .statusCode(200)
@@ -88,7 +93,7 @@ public class ReqResTest {
         given()
                 .log().all()
         .when()
-                .get("https://reqres.in/api/unknown/23")
+                .get(BASE_URL + "unknown/23")
         .then()
                 .log().all()
                 .statusCode(404);
@@ -105,7 +110,7 @@ public class ReqResTest {
                 .header("Content-Type", "application/json")
                 .body(user)
         .when()
-                .post("https://reqres.in/api/users")
+                .post(BASE_URL + "users")
         .then()
                 .log().all()
                 .statusCode(201)
@@ -125,7 +130,7 @@ public class ReqResTest {
                     .header("Content-Type", "application/json")
                     .body(user)
                 .when()
-                    .post("https://reqres.in/api/users")
+                    .post(BASE_URL + "users")
                .then()
                     .log().all()
                     .statusCode(201)
@@ -140,7 +145,7 @@ public class ReqResTest {
                 .header("Content-Type", "application/json")
                 .body(user)
         .when()
-                .put("https://reqres.in/api/users/2")
+                .put(BASE_URL + "users/2")
         .then()
                 .log().all()
                 .statusCode(200)
@@ -152,7 +157,7 @@ public class ReqResTest {
         given()
                 .log().all()
         .when()
-                .delete("https://reqres.in/api/users/2")
+                .delete(BASE_URL + "users/2")
         .then()
                 .log().all()
                 .statusCode(204);
